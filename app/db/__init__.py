@@ -23,7 +23,9 @@ def  get_db():
 
     return g.db
 
-def close_db(e = None):
-    db = g.pop('bd', None)
+def close_db(e=None):
+    db = g.pop('db', None)
     if "db" is not None:
         db.close()
+    #Problem: code works for closing connection object but does not let CSS for app render
+    
