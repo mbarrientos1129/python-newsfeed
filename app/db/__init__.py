@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
-from flask import g 
+from flask import g
 
 load_dotenv()
 
@@ -25,7 +25,12 @@ def  get_db():
 
 def close_db(e=None):
     db = g.pop('db', None)
-    if "db" is not None:
+    print(f"db: {db}")
+    if db is not None:
         db.close()
-    #Problem: code works for closing connection object but does not let CSS for app render
+        print("Database connection closed")
+    else:
+        print("No database connection found")
+        
+        #Problem: code works for closing connection object but does not let CSS for app render
     
