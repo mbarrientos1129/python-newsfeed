@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from app.models import User, Post, Comment, Vote
 from app.db import get_db, Session
+import sys
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -59,24 +60,48 @@ def login():
 
     return jsonify(id=user.id)
 
+
 @bp.route('/comments', methods=['POST'])
 def comment():
     data = request.get_json()
     db = get_db()
 
     try:
-        #create a new comment
+        # create a new comment
         newComment = Comment(
-            comment_text = data['comment_text'],
-            post_id = data['post_id'],
-            user_id = session.get('user_id')
+            comment_text=data['comment_text'],
+            post_id=data['post_id'],
+            user_id=session.get('user_id')
         )
 
-        #save in database
-        db.add (newComment)
+        # save in database
+        db.add(newComment)
         db.commit()
     except:
         db.rollback()
-        return jsonify(message = 'Comment failed'), 500
+        return jsonify(message='Comment failed'), 500
 
-    return jsonify(id = newComment.id)
+    return jsonify(id=newComment.id)
+
+
+@bp.route('/posts/upvote', methods=['PUT'])
+def upvote():
+    data = request.get_json()
+    db = get_db()
+
+    try:
+        # create a new vote with incoming id and session id
+        newVote = Vote(
+            post_id=data['post_id'],
+            user_id=session.get('user_id')
+        )
+
+        db.add(newVote)
+        db.commit()
+    except:
+        print(sys.exc_info()[0])
+
+        db.rollback()
+        return jsonify(message='Upvote failed'), 500
+
+    return '', 204
