@@ -113,11 +113,11 @@ def create():
     db = get_db()
 
     try:
-        #create new post
+        # create new post
         newPost = Post(
             title=data['title'],
             post_url=data['post_url'],
-            user_id=session.get('user_id') 
+            user_id=session.get('user_id')
         )
 
         db.add(newPost)
@@ -128,4 +128,40 @@ def create():
         db.rollback()
         return jsonify(message='Post failed'), 500
 
-    return jsonify(id = newPost.id)
+    return jsonify(id=newPost.id)
+
+
+@bp.route('/posts/<id>', methods=['PUT'])
+def update(id):
+    data = request.get_json()
+    db = get_db()
+
+    try:
+        #retrieve post and update title property
+        post = db.query(Post).filter(Post.id == id).one()
+        post.title = data['title']
+        db.commit()
+    except:
+        print(sys.exc_info()[0])
+
+        db.rollback()
+        return jsonify(message = 'Post not found'), 404
+    
+    return '', 404
+
+
+@bp.route('/posts/<id>', methods=['DELETE'])
+def delete(id):
+    db = get_db()
+
+    try:
+        #delete post from db
+        db.delete(db.query(Post).filter(Post.id == id).one())
+        db.commit()
+    except:
+        print(sys.exc_info()[0])
+
+        db.rollback()
+        return jsonify(message = 'Post not found'), 404
+
+    return '', 204
